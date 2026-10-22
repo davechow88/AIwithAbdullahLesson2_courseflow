@@ -6,7 +6,7 @@ Operating system: Windows 11 Home (10.0.26300)
 
 ## Automated tests
 Command: `python -m unittest discover -s tests -v`
-Number passed: 48
+Number passed: 63
 Number failed: 0
 What I learned: _(write this in your own words)_
 
@@ -17,6 +17,7 @@ What I learned: _(write this in your own words)_
 | `tests/test_search.py` | Feature A: `GET /api/trainees?course=` search | 10 | all ok |
 | `tests/test_register.py` | Feature B: `POST /api/trainees` registration, including "no expiry date before today" | 26 | all ok |
 | `tests/test_courses.py` | `GET /api/courses` list, and registration only allowed for existing courses | 7 | all ok |
+| `tests/test_search_fields.py` | `GET /api/trainees?q=` search across participant, course, expiry date and status | 15 | all ok |
 
 All tests use a temporary database, so the real `courseflow.sqlite3` is never touched.
 
@@ -69,10 +70,25 @@ test_no_filter_returns_all (test_search.StoreSearchTests.test_no_filter_returns_
 test_partial_match (test_search.StoreSearchTests.test_partial_match) ... ok
 test_unknown_course_returns_empty_list (test_search.StoreSearchTests.test_unknown_course_returns_empty_list) ... ok
 test_wildcard_characters_are_literal (test_search.StoreSearchTests.test_wildcard_characters_are_literal) ... ok
+test_course_and_q_together (test_search_fields.ApiSearchFieldsTests.test_course_and_q_together) ... ok
+test_empty_search_returns_all (test_search_fields.ApiSearchFieldsTests.test_empty_search_returns_all) ... ok
+test_no_match_returns_empty_list (test_search_fields.ApiSearchFieldsTests.test_no_match_returns_empty_list) ... ok
+test_search_by_course (test_search_fields.ApiSearchFieldsTests.test_search_by_course) ... ok
+test_search_by_expiry_date (test_search_fields.ApiSearchFieldsTests.test_search_by_expiry_date) ... ok
+test_search_by_participant (test_search_fields.ApiSearchFieldsTests.test_search_by_participant) ... ok
+test_search_by_status (test_search_fields.ApiSearchFieldsTests.test_search_by_status) ... ok
+test_search_unknown_expiry (test_search_fields.ApiSearchFieldsTests.test_search_unknown_expiry) ... ok
+test_case_insensitive (test_search_fields.MatchesSearchTests.test_case_insensitive) ... ok
+test_course (test_search_fields.MatchesSearchTests.test_course) ... ok
+test_expiry_date_partial (test_search_fields.MatchesSearchTests.test_expiry_date_partial) ... ok
+test_missing_expiry_matches_unknown (test_search_fields.MatchesSearchTests.test_missing_expiry_matches_unknown) ... ok
+test_no_match (test_search_fields.MatchesSearchTests.test_no_match) ... ok
+test_participant (test_search_fields.MatchesSearchTests.test_participant) ... ok
+test_status (test_search_fields.MatchesSearchTests.test_status) ... ok
 test_five_fake_trainees_in_isolated_database (test_store.StorageTests.test_five_fake_trainees_in_isolated_database) ... ok
 
 ----------------------------------------------------------------------
-Ran 48 tests in 11.783s
+Ran 63 tests in 15.511s
 
 OK
 ```
@@ -84,6 +100,7 @@ _(tick each box after you have done it yourself at http://localhost:8765)_
 - [ ] Refresh and check persistence
 - [ ] Try an expiry date before today: red "Select valid date" appears and no row is added
 - [ ] Course is a dropdown of existing courses; leaving it on "Select a course" shows red "Course is required"
+- [ ] Search box finds trainees by participant (`alex`), course (`security`), expiry date (`2027`, `unknown`) and status (`soon`)
 
 ## Bug I found and fixed
 Problem: The original test `test_five_fake_trainees_in_isolated_database` failed on Windows with `PermissionError: [WinError 32]`. `store.py` never closed its SQLite connections: `with sqlite3.connect(...)` only saves (commits) the changes and leaves the connection open. Windows will not delete a file that is still open, so the test could not remove its temporary database.

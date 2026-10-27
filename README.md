@@ -19,6 +19,7 @@ You may use Claude Code or Codex to inspect and work on the project, but **ask i
 - `server.py`: local HTTP API (backend)
 - `store.py`: database access and fake data
 - `rules.py`: renewal calculation
+- `scripts/api_healthcheck.py`: checks that a running server answers `GET /api/health` and `GET /api/trainees` (run `python scripts/api_healthcheck.py`)
 - `tests/`: existing automated tests, which should keep passing
 - `AGENTS.md`: guidance for Codex-compatible agents (not the program itself)
 - `HOMEWORK_TASK.md`: the assignment
